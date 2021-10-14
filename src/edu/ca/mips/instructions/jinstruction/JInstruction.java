@@ -2,12 +2,17 @@ package edu.ca.mips.instructions.jinstruction;
 
 import edu.ca.mips.instructions.Instruction;
 
-public abstract class JInstruction extends Instruction {
+public class JInstruction extends Instruction {
     String address;
 
-    public JInstruction(String mnemonic, String opcode, String address) {
-        super(mnemonic, opcode);
-        this.address = address;
+    public JInstruction(String mnemonic, String opcode, String binaryCode) {
+        super(mnemonic, opcode, "J");
+        this.address = binaryCode.substring(6, 32);
+    }
+
+    @Override
+    public void execute() {
+
     }
 
     public String getAddress() {

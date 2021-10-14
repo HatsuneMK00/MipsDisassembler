@@ -2,17 +2,16 @@ package edu.ca.mips.instructions.iinstruction;
 
 import edu.ca.mips.instructions.Instruction;
 
-public abstract class IInstruction extends Instruction {
+public class IInstruction extends Instruction {
     String rd;
     String rs;
     String immediate;
 
-    public IInstruction(String mnemonic, String opcode, String rd, String rs, String immediate) {
-        super(mnemonic, opcode);
-
-        this.rd = rd;
-        this.rs = rs;
-        this.immediate = immediate;
+    public IInstruction(String mnemonic, String opcode, String binaryCode) {
+        super(mnemonic, opcode, "I");
+        this.rs = binaryCode.substring(6, 11);
+        this.rd = binaryCode.substring(11,16);
+        this.immediate = binaryCode.substring(16, 32);
     }
 
     public String getRd() {
@@ -37,5 +36,10 @@ public abstract class IInstruction extends Instruction {
 
     public void setImmediate(String immediate) {
         this.immediate = immediate;
+    }
+
+    @Override
+    public void execute() {
+
     }
 }
