@@ -1,5 +1,6 @@
 package edu.ca.mips;
 
+import edu.ca.mips.data.Data;
 import edu.ca.mips.instructions.Instruction;
 import edu.ca.mips.instructions.iinstruction.IInstruction;
 import edu.ca.mips.instructions.jinstruction.JInstruction;
@@ -13,6 +14,7 @@ import java.util.List;
 public class Disassembler {
 
     HashMap<String, String> opcode2Instruction = new HashMap<>();
+    final int startingAddress = 256;
 
     public Disassembler() {
         opcode2Instruction.put("010000", "J");
@@ -44,7 +46,11 @@ public class Disassembler {
 
     public void parse(List<String> binaryCodes) {
         ArrayList<Instruction> assembleProgram = new ArrayList<>();
-        for (String binaryCode : binaryCodes) {
+        ArrayList<Data> programData = new ArrayList<>();
+
+        int i;
+        for (i = 0; i < binaryCodes.size(); i++) {
+            String binaryCode = binaryCodes.get(i);
             String opcode = binaryCode.substring(0, 6);
             String mnemonic = opcode2Instruction.get(opcode);
 
@@ -70,6 +76,7 @@ public class Disassembler {
                 case "J":
                 {
                     assembleProgram.add(new JInstruction(mnemonic, opcode, binaryCode));
+                    break;
                 }
                 case "ADDI":
                 case "ANDI":
@@ -82,10 +89,27 @@ public class Disassembler {
                 case "XORI":
                 {
                     assembleProgram.add(new IInstruction(mnemonic, opcode, binaryCode));
+                    break;
                 }
             }
+            if (mnemonic.equals("BREAK")) {
+                break;
+            }
         }
-
-
+        for (i = i + 1; i < binaryCodes.size(); i++) {
+            String binaryCode = binaryCodes.get(i);
+            programData.add(new Data(binaryCode));
+        }
+        int programAddress = startingAddress;
+        for (Instruction instruction : assembleProgram) {
+            System.out.print(programAddress + "\t");
+            programAddress += 4;
+            System.out.println(instruction);
+        }
+        for (Data programDatum : programData) {
+            System.out.print(programAddress + "\t");
+            programAddress += 4;
+            System.out.println(programDatum);
+        }
     }
 }
