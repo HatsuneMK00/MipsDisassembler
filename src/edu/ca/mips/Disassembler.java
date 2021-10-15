@@ -5,6 +5,7 @@ import edu.ca.mips.instructions.Instruction;
 import edu.ca.mips.instructions.iinstruction.IInstruction;
 import edu.ca.mips.instructions.jinstruction.JInstruction;
 import edu.ca.mips.instructions.rinstruction.RInstruction;
+import edu.ca.mips.utils.FileUtil;
 
 import java.io.*;
 import java.util.ArrayList;
@@ -114,27 +115,18 @@ public class Disassembler {
         List<Instruction> assembleProgram = getAssembleProgram(parseResult);
         List<Data> programData = getProgramData(parseResult);
 
-        File resultFile = new File(resultFilepath);
-        if (!resultFile.getParentFile().exists()) {
-            if (!resultFile.getParentFile().mkdirs()) {
-                return;
-            }
+        PrintWriter out = FileUtil.getPrintWriter(resultFilepath);
+        if (out == null) {
+            return;
         }
-        if (!resultFile.exists()) {
-            resultFile.createNewFile();
-        }
-
-        BufferedWriter out = new BufferedWriter(new FileWriter(resultFile, false));
 
         for (Instruction instruction : assembleProgram) {
-            out.write(instruction.getInstructionAddress() + "\t");
-            out.write(instruction.toString());
-            out.newLine();
+            out.print(instruction.getInstructionAddress() + "\t");
+            out.println(instruction.toString());
         }
         for (Data programDatum : programData) {
-            out.write(programDatum.getDataAddress() + "\t");
-            out.write(programDatum.toString());
-            out.newLine();
+            out.print(programDatum.getDataAddress() + "\t");
+            out.println(programDatum.toString());
         }
         out.close();
     }

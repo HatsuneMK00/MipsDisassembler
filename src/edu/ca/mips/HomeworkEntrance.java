@@ -15,7 +15,7 @@ public class HomeworkEntrance {
 
     public static void main(String[] args) {
         disassemble();
-//        simulate();
+        simulate();
     }
 
     public static void disassemble() {
