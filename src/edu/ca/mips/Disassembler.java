@@ -6,6 +6,7 @@ import edu.ca.mips.instructions.iinstruction.IInstruction;
 import edu.ca.mips.instructions.jinstruction.JInstruction;
 import edu.ca.mips.instructions.rinstruction.RInstruction;
 
+import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +17,7 @@ public class Disassembler {
     HashMap<String, String> opcode2Instruction = new HashMap<>();
     final int startingAddress = 256;
 
-//    final String resultFilepath = ""
+    final String resultFilepath = "result/disassembly.txt";
 
     public Disassembler() {
         opcode2Instruction.put("010000", "J");
@@ -108,18 +109,34 @@ public class Disassembler {
         return resultObj;
     }
 
-    public void parseAndPrintResult(List<String> binaryCodes) {
+    public void parseAndPrintResult(List<String> binaryCodes) throws IOException {
         Map<String, Object> parseResult = parse(binaryCodes);
         List<Instruction> assembleProgram = getAssembleProgram(parseResult);
         List<Data> programData = getProgramData(parseResult);
+
+        File resultFile = new File(resultFilepath);
+        if (!resultFile.getParentFile().exists()) {
+            if (!resultFile.getParentFile().mkdirs()) {
+                return;
+            }
+        }
+        if (!resultFile.exists()) {
+            resultFile.createNewFile();
+        }
+
+        BufferedWriter out = new BufferedWriter(new FileWriter(resultFile, false));
+
         for (Instruction instruction : assembleProgram) {
-            System.out.print(instruction.getInstructionAddress() + "\t");
-            System.out.println(instruction);
+            out.write(instruction.getInstructionAddress() + "\t");
+            out.write(instruction.toString());
+            out.newLine();
         }
         for (Data programDatum : programData) {
-            System.out.print(programDatum.getDataAddress() + "\t");
-            System.out.println(programDatum);
+            out.write(programDatum.getDataAddress() + "\t");
+            out.write(programDatum.toString());
+            out.newLine();
         }
+        out.close();
     }
 
     public List<Instruction> getAssembleProgram(Map<String, Object> result) {
