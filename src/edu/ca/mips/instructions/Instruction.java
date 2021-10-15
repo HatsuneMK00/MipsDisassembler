@@ -1,11 +1,16 @@
 package edu.ca.mips.instructions;
 
-public abstract class Instruction {
-    String mnemonic;  // 指令名称
-    String opcode;
-    String type;  // 指令类型
+import java.util.List;
 
-    public Instruction(String mnemonic, String opcode, String type) {
+public abstract class Instruction {
+    private int instructionAddress;
+
+    private String mnemonic;  // 指令名称
+    private String opcode;
+    private String type;  // 指令类型
+
+    public Instruction(int instructionAddress, String mnemonic, String opcode, String type) {
+        this.instructionAddress = instructionAddress;
         this.mnemonic = mnemonic;
         this.opcode = opcode;
         this.type = type;
@@ -14,7 +19,7 @@ public abstract class Instruction {
     public Instruction() {
     }
 
-    abstract public void execute();
+    abstract public int execute(List<Integer> registers, List<Integer> memory, int dataStartAddress);
 
     public String getMnemonic() {
         return mnemonic;
@@ -30,5 +35,13 @@ public abstract class Instruction {
 
     public void setOpcode(String opcode) {
         this.opcode = opcode;
+    }
+
+    public int getInstructionAddress() {
+        return instructionAddress;
+    }
+
+    public void setInstructionAddress(int instructionAddress) {
+        this.instructionAddress = instructionAddress;
     }
 }

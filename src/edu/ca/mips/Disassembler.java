@@ -6,15 +6,17 @@ import edu.ca.mips.instructions.iinstruction.IInstruction;
 import edu.ca.mips.instructions.jinstruction.JInstruction;
 import edu.ca.mips.instructions.rinstruction.RInstruction;
 
-import java.io.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class Disassembler {
 
     HashMap<String, String> opcode2Instruction = new HashMap<>();
     final int startingAddress = 256;
+
+//    final String resultFilepath = ""
 
     public Disassembler() {
         opcode2Instruction.put("010000", "J");
@@ -44,12 +46,15 @@ public class Disassembler {
         opcode2Instruction.put("111011", "XORI");
     }
 
-    public void parse(List<String> binaryCodes) {
+    public Map<String, Object> parse(List<String> binaryCodes) {
         ArrayList<Instruction> assembleProgram = new ArrayList<>();
         ArrayList<Data> programData = new ArrayList<>();
-
+        HashMap<String, Object> resultObj = new HashMap<>();
+        resultObj.put("assembleProgram", assembleProgram);
+        resultObj.put("programData", programData);
         int i;
-        for (i = 0; i < binaryCodes.size(); i++) {
+        int programAddress;
+        for (i = 0, programAddress = startingAddress; i < binaryCodes.size(); i++, programAddress+=4) {
             String binaryCode = binaryCodes.get(i);
             String opcode = binaryCode.substring(0, 6);
             String mnemonic = opcode2Instruction.get(opcode);
@@ -70,12 +75,12 @@ public class Disassembler {
                 case "SUB":
                 case "XOR":
                 {
-                    assembleProgram.add(new RInstruction(mnemonic, opcode, binaryCode));
+                    assembleProgram.add(new RInstruction(programAddress, mnemonic, opcode, binaryCode));
                     break;
                 }
                 case "J":
                 {
-                    assembleProgram.add(new JInstruction(mnemonic, opcode, binaryCode));
+                    assembleProgram.add(new JInstruction(programAddress, mnemonic, opcode, binaryCode));
                     break;
                 }
                 case "ADDI":
@@ -88,7 +93,7 @@ public class Disassembler {
                 case "SW":
                 case "XORI":
                 {
-                    assembleProgram.add(new IInstruction(mnemonic, opcode, binaryCode));
+                    assembleProgram.add(new IInstruction(programAddress, mnemonic, opcode, binaryCode));
                     break;
                 }
             }
@@ -96,20 +101,32 @@ public class Disassembler {
                 break;
             }
         }
-        for (i = i + 1; i < binaryCodes.size(); i++) {
+        for (i = i + 1, programAddress+=4; i < binaryCodes.size(); i++, programAddress+=4) {
             String binaryCode = binaryCodes.get(i);
-            programData.add(new Data(binaryCode));
+            programData.add(new Data(programAddress, binaryCode));
         }
-        int programAddress = startingAddress;
+        return resultObj;
+    }
+
+    public void parseAndPrintResult(List<String> binaryCodes) {
+        Map<String, Object> parseResult = parse(binaryCodes);
+        List<Instruction> assembleProgram = getAssembleProgram(parseResult);
+        List<Data> programData = getProgramData(parseResult);
         for (Instruction instruction : assembleProgram) {
-            System.out.print(programAddress + "\t");
-            programAddress += 4;
+            System.out.print(instruction.getInstructionAddress() + "\t");
             System.out.println(instruction);
         }
         for (Data programDatum : programData) {
-            System.out.print(programAddress + "\t");
-            programAddress += 4;
+            System.out.print(programDatum.getDataAddress() + "\t");
             System.out.println(programDatum);
         }
+    }
+
+    public List<Instruction> getAssembleProgram(Map<String, Object> result) {
+        return (List<Instruction>) result.get("assembleProgram");
+    }
+
+    public List<Data> getProgramData(Map<String, Object> result) {
+        return (List<Data>) result.get("programData");
     }
 }

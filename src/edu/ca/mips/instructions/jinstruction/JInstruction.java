@@ -2,17 +2,19 @@ package edu.ca.mips.instructions.jinstruction;
 
 import edu.ca.mips.instructions.Instruction;
 
+import java.util.List;
+
 public class JInstruction extends Instruction {
     private String address;
 
-    public JInstruction(String mnemonic, String opcode, String binaryCode) {
-        super(mnemonic, opcode, "J");
+    public JInstruction(int instructionAddress, String mnemonic, String opcode, String binaryCode) {
+        super(instructionAddress, mnemonic, opcode, "J");
         this.address = binaryCode.substring(6, 32);
     }
 
     @Override
-    public void execute() {
-
+    public int execute(List<Integer> registers, List<Integer> memory, int dataStartAddress) {
+        return Integer.parseInt(getAddress());
     }
 
     public String getAddress() {
